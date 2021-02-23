@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: spark-worker-1
+  name: spark-worker-1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: spark-worker-1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: spark-worker-1
+    spec:
+      containers:
+        - args:
+            - bin/spark-class
+            - org.apache.spark.deploy.worker.Worker
+            - spark://master:7077
+          env:
+            - name: SPARK_CONF_DIR
+              value: /conf
+            - name: SPARK_PUBLIC_DNS
+              value: localhost
+            - name: SPARK_WORKER_CORES
+              value: "1"
+            - name: SPARK_WORKER_MEMORY
+              value: 2g
+            - name: SPARK_WORKER_PORT
+              value: "8881"
+            - name: SPARK_WORKER_WEBUI_PORT
+              value: "8081"
+          image: renien/spark-stand-alone
+          name: spark-worker-1
+          ports:
+            - containerPort: 8081
+            - containerPort: 7012
+            - containerPort: 7013
+            - containerPort: 7014
+            - containerPort: 7015
+            - containerPort: 8881
+          resources: {}
+          volumeMounts:
+            - mountPath: /conf
+              name: spark-worker-1-claim0
+            - mountPath: /tmp/data
+              name: spark-worker-1-claim1
+      restartPolicy: Always
+      volumes:
+        - name: spark-worker-1-claim0
+          persistentVolumeClaim:
+            claimName: spark-worker-1-claim0
+        - name: spark-worker-1-claim1
+          persistentVolumeClaim:
+            claimName: spark-worker-1-claim1
+status: {}

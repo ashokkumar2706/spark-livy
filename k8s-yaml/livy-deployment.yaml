@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: livy
+  name: livy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: livy
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: livy
+    spec:
+      containers:
+        - env:
+            - name: LIVY_FILE_LOCAL_DIR_WHITELIST
+              value: /opt/jars
+            - name: SPARK_CONF_DIR
+              value: /conf
+            - name: SPARK_DIVER_CORES
+              value: "1"
+            - name: SPARK_DRIVER_MEMORY
+              value: 1g
+            - name: SPARK_MASTER_ENDPOINT
+              value: master
+            - name: SPARK_MASTER_PORT
+              value: "7077"
+          image: renien/spark-stand-alone-livy
+          name: livy
+          ports:
+            - containerPort: 8998
+            - containerPort: 4040
+          resources: {}
+          volumeMounts:
+            - mountPath: /opt/jars
+              name: livy-claim0
+            - mountPath: /usr/local/bin/livy.conf.extra
+              name: livy-claim1
+      restartPolicy: Always
+      volumes:
+        - name: livy-claim0
+          persistentVolumeClaim:
+            claimName: livy-claim0
+        - name: livy-claim1
+          persistentVolumeClaim:
+            claimName: livy-claim1
+status: {}
