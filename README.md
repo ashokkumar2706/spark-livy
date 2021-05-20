@@ -1,3 +1,8 @@
+https://spark.apache.org/docs/latest/submitting-applications.html
+https://spark.apache.org/docs/latest/configuration.html
+https://spark.apache.org/docs/latest/cluster-overview.html
+
+
 <h1 align="center">
   <h4 align="center">Docker Spark & Livy</h4>
 </h1>
